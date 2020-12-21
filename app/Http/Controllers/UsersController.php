@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use App\Grids\UsersGridInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 class UsersController extends Controller
 {
     /**
@@ -36,6 +38,7 @@ class UsersController extends Controller
      */
     public function create(Request $request)
     {
+        $roles = Role::all();
         $modal = [
             'model' => class_basename(User::class),
             'route' => route('users.store'),
@@ -43,7 +46,7 @@ class UsersController extends Controller
             'pjaxContainer' => $request->get('ref'),
         ];
 
-        return view('users.user_modal', compact('modal'))->render();
+        return view('users.user_modal', compact('modal', 'roles'))->render();
     }
 
     /**
@@ -55,18 +58,38 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
+            'name' => 'required|min:4|max:50',
             'email' => 'required|email|unique:Users',
-            'password' => 'required'
-
+            'password' => 'required|min:3|max:30',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'phone' => 'required',
         ]);
 
-        $user = User::query()->create($request->all());
+        $user = new User;
+        if ($request->hasFile('avatar')) {
+            $user->avatar = $request->avatar;
+        } else {
+            $user->avatar = "";
+        }
+
+        if(!$request->role_id) {
+            // $user->role_id = Role::query()->select('id')->get()->random()->id;
+        } else {
+            $user->role_id = $request->role_id;
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->phone = $request->phone;
+        $user->address = $request->address;
+        $user->save();
 
         return new JsonResponse([
             'success' => true,
             'message' => 'User with id ' . $user->name . ' has been created.'
         ]);
+
     }
 
     /**

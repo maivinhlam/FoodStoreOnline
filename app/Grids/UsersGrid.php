@@ -4,7 +4,7 @@ namespace App\Grids;
 
 use Closure;
 use Leantony\Grid\Grid;
-
+use App\Models\Role;
 class UsersGrid extends Grid implements UsersGridInterface
 {
     /**
@@ -70,6 +70,41 @@ class UsersGrid extends Grid implements UsersGridInterface
 		            "enabled" => true,
 		            "operator" => "="
 		        ]
+		    ],
+		    "phone" => [
+		        "search" => [
+		            "enabled" => true
+		        ],
+		        "filter" => [
+		            "enabled" => true,
+		            "operator" => "="
+		        ]
+		    ],
+		    "avatar" => [
+		        "search" => [
+		            "enabled" => true
+		        ],
+		        "filter" => [
+		            "enabled" => true,
+		            "operator" => "="
+		        ]
+		    ],
+		    "address" => [
+		        "search" => [
+		            "enabled" => true
+		        ],
+		        "filter" => [
+		            "enabled" => true,
+		            "operator" => "="
+		        ]
+		    ],
+		    "role_id" => [
+		        "filter" => [
+		            "enabled" => true,
+		            "type" => "select",
+                    'data' => Role::query()->pluck('name', 'id')
+		        ],
+		        "export" => false
 		    ],
 		    "created_at" => [
 		        "sort" => false,
